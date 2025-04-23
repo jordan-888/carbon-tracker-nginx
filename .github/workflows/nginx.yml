@@ -1,0 +1,40 @@
+name: Nginx CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build Nginx image
+      run: docker-compose build
+
+    - name: Test Nginx configuration
+      run: docker-compose run --rm nginx nginx -t
+
+    - name: Start Nginx
+      run: docker-compose up -d
+
+    - name: Wait for Nginx to start
+      run: sleep 10
+
+    - name: Check Nginx status
+      run: |
+        docker-compose ps
+        curl -f http://localhost/health || exit 1
+
+    - name: Check Nginx logs
+      run: docker-compose logs nginx
+
+    - name: Stop Nginx
+      run: docker-compose down 
