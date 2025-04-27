@@ -1,96 +1,67 @@
-# Nginx Server for Carbon Tracker Project
+# Carbon Tracker Nginx Configuration
 
-This is a production-ready Nginx server configuration for deploying the Carbon Tracker project. The server acts as a reverse proxy, handling both the frontend and backend services.
+This repository contains the Nginx configuration and deployment files for the Carbon Tracker application.
 
-## Features
+## Configuration Files
 
-- Reverse proxy for frontend and backend services
-- Optimized for production use
-- Security headers configured
-- Gzip compression enabled
-- Docker-based deployment
-- Easy integration with the Carbon Tracker project
+- `nginx.prod.conf`: Production Nginx configuration
+- `docker-compose.prod.yml`: Production Docker Compose configuration
+- `Dockerfile.prod`: Production Dockerfile for Nginx
+- `deploy.sh`: Deployment script
 
-## Prerequisites
+## Production Setup
 
-- Docker
-- Docker Compose
-- Git
+The production setup includes:
 
-## Directory Structure
+1. Nginx reverse proxy
+2. SSL/TLS configuration
+3. Backend API proxy
+4. Static file serving for the frontend
+5. Health checks
+6. Docker Compose configuration for all services
 
-```
-nginx-server/
-├── Dockerfile
-├── docker-compose.yml
-├── nginx.conf
-└── README.md
-```
+### Environment Variables
 
-## Configuration
+Required environment variables:
 
-The Nginx server is configured to:
-- Serve the frontend on the root path (/)
-- Proxy API requests to the backend on /api path
-- Handle WebSocket connections
-- Apply security headers
-- Enable Gzip compression
+- `DOCKER_REGISTRY`: Docker registry URL (e.g., ghcr.io)
+- `IMAGE_NAME`: Image name from GitHub repository
+- `JWT_SECRET`: Secret for JWT token generation
 
-## Deployment
+### SSL Configuration
 
-1. Clone this repository:
-   ```bash
-   git clone <repository-url>
-   cd nginx-server
-   ```
+Place your SSL certificates in the `ssl` directory:
+- `ssl/certificate.crt`: SSL certificate
+- `ssl/private.key`: Private key
 
-2. Build and start the services:
-   ```bash
-   docker-compose up -d
-   ```
+### Deployment
 
-3. The application will be available at:
-   - Frontend: http://localhost
-   - Backend API: http://localhost/api
+The application is deployed using GitHub Actions. The workflow:
 
-## Environment Variables
+1. Builds the frontend
+2. Creates a Docker image
+3. Pushes to GitHub Container Registry
+4. Deploys to the production server
 
-The following environment variables are used:
-- `MONGODB_URI`: MongoDB connection string
-- `JWT_SECRET`: Secret key for JWT token generation
+### Monitoring
+
+- Access logs: `logs/access.log`
+- Error logs: `logs/error.log`
+- Health check endpoint: `/health`
+
+## Development
+
+To make changes:
+
+1. Create a new branch
+2. Update configuration files
+3. Test locally
+4. Create a pull request
+5. Merge after review
 
 ## Security
 
-The configuration includes:
-- XSS protection
-- Content Security Policy
-- Frame options
-- Content type sniffing protection
-- Referrer policy
-
-## Monitoring
-
-Logs can be accessed through:
-- Access logs: `/var/log/nginx/access.log`
-- Error logs: `/var/log/nginx/error.log`
-
-## Troubleshooting
-
-1. Check container status:
-   ```bash
-   docker-compose ps
-   ```
-
-2. View logs:
-   ```bash
-   docker-compose logs nginx
-   ```
-
-3. Restart services:
-   ```bash
-   docker-compose restart
-   ```
-
-## License
-
-This project is open source and available under the MIT License. 
+- All traffic is encrypted using SSL/TLS
+- Backend is not directly accessible
+- Regular security updates
+- Environment variables for sensitive data
